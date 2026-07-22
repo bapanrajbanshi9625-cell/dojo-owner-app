@@ -22,14 +22,19 @@ jobs:
           channel: 'stable'
           cache: true
           
-      - name: Install dependencies
-        run: flutter pub get
-        
-      - name: Build APK
-        run: flutter build apk --release --no-pub
-        
+      - name: Create New Flutter Project and Inject main.dart
+        run: |
+          flutter create temp_app --org com.dojo.owner --project-name dojo_owner_app
+          cd temp_app
+          # Remove default main.dart and copy our repository's main.dart into it
+          rm lib/main.dart
+          cp ../main.dart lib/main.dart
+          
+          # Build APK from this complete project
+          flutter build apk --release
+          
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: temp_app/build/app/outputs/flutter-apk/app-release.apk
