@@ -14,7 +14,7 @@ class DojoOwnerApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.teal,
-        scaffoldBackgroundColor: const Color(0xFFEAF4F4),
+        scaffoldBackgroundColor: const Color(0xFFFEAF4F4),
       ),
       home: const MainDashboard(),
     );
@@ -30,7 +30,15 @@ class MainDashboard extends StatefulWidget {
 
 class _MainDashboardState extends State<MainDashboard> {
   int _selectedIndex = 0;
-  bool isSubscribed = true; // डिफ़ॉल्ट रूप से एक्टिव सब्सक्राइबर
+  bool isSubscribed = true;
+  
+  // डायनेमिक ओनर और लाइव वॉक डेटा
+  String ownerName = "Bapan";
+  String walkDuration = "24:15";
+  int susuCount = 1;
+  int pottyCount = 2;
+  String activeWalker = "W-9842 (Ravi Kumar)";
+  String activeRoute = "Lake View Garden";
 
   void _onItemTapped(int index) {
     setState(() {
@@ -105,7 +113,7 @@ class _MainDashboardState extends State<MainDashboard> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Notifications'),
-        content: const Text('• Walker W-9842 started the walk.\n• Monthly subscription active (₹100/m).'),
+        content: const Text('Walker W-9842 started the walk.\nMonthly subscription active (₹100/m).'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -121,7 +129,7 @@ class _MainDashboardState extends State<MainDashboard> {
     final List<Widget> screens = [
       _buildHomeScreen(),
       const WalkHistoryScreen(),
-      AccountScreen(isSubscribed: isSubscribed),
+      AccountScreen(isSubscribed: isSubscribed, ownerName: ownerName),
     ];
 
     return Scaffold(
@@ -137,16 +145,16 @@ class _MainDashboardState extends State<MainDashboard> {
             icon: const Icon(Icons.notifications_active, color: Colors.teal),
             onPressed: _showNotificationsDialog,
           ),
-          const Padding(
-            padding: EdgeInsets.only(right: 12.0),
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0),
             child: Center(
               child: Text(
-                'Welcome Back,\n[Owner Name]!',
+                'Welcome Back,\n$ownerName!',
                 textAlign: TextAlign.right,
-                style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 13),
+                style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 13),
               ),
             ),
-          )
+          ),
         ],
       ),
       body: screens[_selectedIndex],
@@ -184,15 +192,15 @@ class _MainDashboardState extends State<MainDashboard> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 image: const DecorationImage(
-                  image: NetworkImage('https://i.stack.imgur.com/HILmr.png'),
+                  image: NetworkImage('https://i.stack.imgur.com/HlImr.png'),
                   fit: BoxFit.cover,
                   opacity: 0.3,
                 ),
                 border: Border.all(color: Colors.teal.shade100, width: 2),
               ),
-              child: const Center(
+              child: Center(
                 child: Chip(
-                  label: Text('Your Dog & Walker', style: TextStyle(color: Colors.white)),
+                  label: Text('Walker: $activeWalker', style: const TextStyle(color: Colors.white)),
                   backgroundColor: Colors.teal,
                 ),
               ),
@@ -200,18 +208,18 @@ class _MainDashboardState extends State<MainDashboard> {
           ),
           const SizedBox(height: 16),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildStatCard('Walk Duration', '24:15'),
-              _buildStatCard('Susu', '1', icon: Icons.pets),
-              _buildStatCard('Potty', '2', icon: Icons.delete_outline),
+              _buildStatCard('Walk Duration', walkDuration),
+              _buildStatCard('Susu', '$susuCount', icon: Icons.pets),
+              _buildStatCard('Potty', '$pottyCount', icon: Icons.delete_outline),
             ],
           ),
           const SizedBox(height: 24),
           Center(
             child: SizedBox(
               width: double.infinity,
-              height: 70,
+              height: 50,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepOrange.shade400,
@@ -220,7 +228,7 @@ class _MainDashboardState extends State<MainDashboard> {
                 onPressed: _onGenerateQRCodeClicked,
                 icon: const Icon(Icons.camera_alt, color: Colors.white, size: 30),
                 label: const Text(
-                  'GENERATE QR CODE\nFOR NEW WALK',
+                  'GENERATE QR CODE FOR NEW WALK',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
@@ -254,7 +262,6 @@ class _MainDashboardState extends State<MainDashboard> {
   }
 }
 
-// वॉक हिस्ट्री स्क्रीन (क्लिक करने योग्य कार्ड्स के साथ)
 class WalkHistoryScreen extends StatelessWidget {
   const WalkHistoryScreen({Key? key}) : super(key: key);
 
@@ -322,7 +329,7 @@ class WalkHistoryScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Text(walk['date'], style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.teal)),
                               Text(walk['duration'], style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -359,7 +366,6 @@ class WalkHistoryScreen extends StatelessWidget {
   }
 }
 
-// वॉक डिटेल और मैप रूट पेज
 class WalkDetailScreen extends StatelessWidget {
   final Map<String, dynamic> walkData;
   const WalkDetailScreen({Key? key, required this.walkData}) : super(key: key);
@@ -383,7 +389,7 @@ class WalkDetailScreen extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 image: const DecorationImage(
-                  image: NetworkImage('https://i.stack.imgur.com/HILmr.png'),
+                  image: NetworkImage('https://i.stack.imgur.com/HlImr.png'),
                   fit: BoxFit.cover,
                   opacity: 0.4,
                 ),
@@ -419,39 +425,42 @@ class WalkDetailScreen extends StatelessWidget {
   }
 }
 
-// अकाउंट स्क्रीन (जिसमें सभी सेटिंग्स और बटन्स काम करेंगे)
 class AccountScreen extends StatelessWidget {
   final bool isSubscribed;
-  const AccountScreen({Key? key, required this.isSubscribed}) : super(key: key);
+  final String ownerName;
+  const AccountScreen({Key? key, required this.isSubscribed, required this.ownerName}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const CircleAvatar(radius: 40, backgroundColor: Colors.teal, child: Icon(Icons.person, size: 50, color: Colors.white)),
+          const Center(
+            child: CircleAvatar(radius: 40, backgroundColor: Colors.teal, child: Icon(Icons.person, size: 50, color: Colors.white)),
+          ),
           const SizedBox(height: 10),
-          const Text('[Owner Name]', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+          Center(
+            child: Text(ownerName, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+          ),
           const SizedBox(height: 5),
-          const Text('Member since: 2022-04-12', style: TextStyle(fontSize: 13, color: Colors.black54)),
+          const Center(
+            child: Text('Member since: 2022-04-12', style: TextStyle(fontSize: 13, color: Colors.black54)),
+          ),
           const SizedBox(height: 15),
-          
-          // 1. सब्सक्रिप्शन स्टेटस कार्ड
           Card(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: ListTile(
-              title: const Text('Subscription Status', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey)),
+              title: const Text('Subscription Status', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
               subtitle: Text(
                 isSubscribed ? 'Active Subscriber\nPlan: ₹100/month' : 'Free Plan',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isSubscribed ? Colors.green : Colors.red),
               ),
-              trailing: const Icon(Icons.check_circle, color: Colors.green),
+              trailing: Icon(isSubscribed ? Icons.check_circle : Icons.warning, color: isSubscribed ? Colors.green : Colors.red),
             ),
           ),
           const SizedBox(height: 10),
-
-          // 2. पेमेंट मेथड बटन
           ListTile(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             tileColor: Colors.white,
@@ -474,8 +483,6 @@ class AccountScreen extends StatelessWidget {
             },
           ),
           const SizedBox(height: 8),
-
-          // 3. नोटिफिकेशन्स सेटिंग्स बटन
           ListTile(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             tileColor: Colors.white,
@@ -488,17 +495,15 @@ class AccountScreen extends StatelessWidget {
                 context: context,
                 builder: (context) => AlertDialog(
                   title: const Text('Notifications Settings'),
-                  content: const Text('• Walk Alerts: ON\n• Subscription Reminders: ON\n• Promotional Offers: OFF'),
+                  content: const Text('Walk Alerts: ON\nSubscription Reminders: ON\nPromotional Offers: OFF'),
                   actions: [
-                    TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))
+                    TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK')),
                   ],
                 ),
               );
             },
           ),
           const SizedBox(height: 8),
-
-          // 4. कॉन्टैक्ट सपोर्ट बटन
           ListTile(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             tileColor: Colors.white,
@@ -513,7 +518,7 @@ class AccountScreen extends StatelessWidget {
                   title: const Text('Contact Support'),
                   content: const Text('Helpline: +91 98765 43210\nEmail: support@dojowalker.com'),
                   actions: [
-                    TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))
+                    TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK')),
                   ],
                 ),
               );
